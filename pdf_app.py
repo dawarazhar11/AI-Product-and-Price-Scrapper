@@ -735,36 +735,10 @@ def main():
     # Sidebar for input options
     with st.sidebar:
         st.header("PDF Source")
-        input_option = st.radio("Choose input method", ["URL", "Extract from Website", "Upload File"])
+        input_option = st.radio("Choose input method", ["Extract from Website", "URL", "Upload File"], index=0)
     
-    if input_option == "URL":
-        url = st.text_input("Enter PDF URL", value="https://tablard.ch/menu.pdf")
-        
-        if url:
-            if is_pdf_url(url):
-                st.info(f"Detected PDF URL: {url}")
-                
-                # Check if it's a menu
-                is_menu = st.checkbox("Process as menu", value="menu" in url.lower())
-                
-                if st.button("Process PDF", key="process_single_pdf"):
-                    if is_menu:
-                        with st.spinner(f"Processing menu PDF from {url}..."):
-                            result = process_menu_pdf(url)
-                    else:
-                        with st.spinner(f"Processing PDF from {url}..."):
-                            result = process_pdf(url)
-                    
-                    if result["extraction_success"]:
-                        st.success("PDF processed successfully")
-                        display_pdf_content(result)
-                    else:
-                        st.error("Failed to process the PDF")
-            else:
-                st.warning("The URL does not appear to be a PDF. Please enter a valid PDF URL.")
-    
-    elif input_option == "Extract from Website":
-        website_url = st.text_input("Enter website URL to extract PDF links from", value="")
+    if input_option == "Extract from Website":
+        website_url = st.text_input("Enter website URL to extract PDF links from", value="https://tablard.ch")
         
         if website_url:
             # Function to update PDF links in session state
@@ -814,6 +788,31 @@ def main():
                         st.session_state.processing_complete = True
             elif website_url and not st.session_state.pdf_links:
                 st.warning("No PDF links found on the provided website.")
+    elif input_option == "URL":
+        url = st.text_input("Enter PDF URL", value="https://tablard.ch/menu.pdf")
+        
+        if url:
+            if is_pdf_url(url):
+                st.info(f"Detected PDF URL: {url}")
+                
+                # Check if it's a menu
+                is_menu = st.checkbox("Process as menu", value="menu" in url.lower())
+                
+                if st.button("Process PDF", key="process_single_pdf"):
+                    if is_menu:
+                        with st.spinner(f"Processing menu PDF from {url}..."):
+                            result = process_menu_pdf(url)
+                    else:
+                        with st.spinner(f"Processing PDF from {url}..."):
+                            result = process_pdf(url)
+                    
+                    if result["extraction_success"]:
+                        st.success("PDF processed successfully")
+                        display_pdf_content(result)
+                    else:
+                        st.error("Failed to process the PDF")
+            else:
+                st.warning("The URL does not appear to be a PDF. Please enter a valid PDF URL.")
     else:
         display_pdf_uploader()
 
