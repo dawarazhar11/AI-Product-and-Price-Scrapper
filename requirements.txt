@@ -1,0 +1,41 @@
+beautifulsoup4
+cfscrape
+chromadb
+free-proxy
+fuzzywuzzy
+html2text
+loguru
+matplotlib
+nest-asyncio
+numpy
+pandas
+Pillow
+playwright
+price-parser
+python-Levenshtein
+pyOpenSSL
+rapidfuzz
+requests
+rich
+scikit-learn
+scrapegraphai
+selenium
+sentence-transformers
+streamlit
+textdistance
+torch
+undetected-chromedriver
+urllib3==1.26.6
+webdriver-manager 
+# PDF handling
+pdfplumber==0.11.2
+PyPDF2==3.0.1
+PyMuPDF==1.25.0  # Added for enhanced PDF processing
+
+# Translation and language detection
+langdetect==1.0.9
+deep-translator==1.11.4
+
+# Image processing
+Pillow==10.2.
+psutil
