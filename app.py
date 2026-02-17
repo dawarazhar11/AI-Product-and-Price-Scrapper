@@ -56,6 +56,9 @@ import os
 import sys
 import hashlib
 from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Import the data verification function
 try:
@@ -95,13 +98,13 @@ try:
             # Force _path to be a list
             try:
                 torch._classes.__path__._path = []
-            except:
+            except (AttributeError, TypeError):
                 # If direct assignment fails, use a more aggressive approach
                 setattr(torch._classes.__path__, "_path", [])
 except ImportError:
     pass
 except Exception as e:
-    print(f"Warning: Failed to patch torch._classes.__path__: {e}")
+    logger.warning(f"Failed to patch torch._classes.__path__: {e}")
 
 # Fix asyncio event loop issues
 try:
@@ -119,7 +122,7 @@ try:
 except ImportError:
     pass
 except Exception as e:
-    print(f"Warning: Failed to configure asyncio: {e}")
+    logger.warning(f"Failed to configure asyncio: {e}")
 
 # Now import streamlit after all patches are applied
 # Add ScrapeGraphAI import
@@ -128,7 +131,7 @@ try:
     SCRAPEGRAPH_AVAILABLE = True
 except ImportError:
     SCRAPEGRAPH_AVAILABLE = False
-    print("ScrapeGraphAI not available. Some features will be disabled.")
+    logger.info("ScrapeGraphAI not available. Some features will be disabled.")
 
 # Try to import sentence-transformers but provide fallback
 sentence_model = None
@@ -185,20 +188,20 @@ if "verification_results" not in st.session_state:
 CHROMA_DB_PATH = "./chroma_db"  # Local path for Chroma database
 chroma_client = chromadb.Client(Settings(persist_directory=CHROMA_DB_PATH))
 
-# Ollama API endpoint
-OLLAMA_API_URL = "http://100.115.243.42:11434/api/generate"
-OLLAMA_EMBEDDINGS_URL = "http://100.115.243.42:11434/api/embeddings"
-OLLAMA_MODELS_URL = "http://100.115.243.42:11434/api/tags"
+# Ollama API endpoint (configurable via OLLAMA_HOST env var or .env file)
+_OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+OLLAMA_API_URL = f"{_OLLAMA_HOST}/api/generate"
+OLLAMA_EMBEDDINGS_URL = f"{_OLLAMA_HOST}/api/embeddings"
+OLLAMA_MODELS_URL = f"{_OLLAMA_HOST}/api/tags"
 
-# Request timeout settings
-DEFAULT_TIMEOUT = 600  # Increased timeout for API requests (in seconds)
-# Increased timeout for web scraping operations (in seconds)
-DEFAULT_SCRAPE_TIMEOUT = 300
-MAX_RETRIES = 3  # Maximum number of retries for failed requests
-RETRY_BACKOFF = 2  # Exponential backoff factor for retries
+# Request timeout settings (configurable via environment variables)
+DEFAULT_TIMEOUT = int(os.getenv("DEFAULT_TIMEOUT", "600"))
+DEFAULT_SCRAPE_TIMEOUT = int(os.getenv("DEFAULT_SCRAPE_TIMEOUT", "300"))
+MAX_RETRIES = int(os.getenv("MAX_RETRIES", "3"))
+RETRY_BACKOFF = int(os.getenv("RETRY_BACKOFF", "2"))
 
 # Default embedding model
-DEFAULT_EMBEDDING_MODEL = "nomic-embed-text:latest"
+DEFAULT_EMBEDDING_MODEL = os.getenv("DEFAULT_EMBEDDING_MODEL", "nomic-embed-text:latest")
 
 # Ensure compatibility with Windows event loops
 if sys.platform == "win32":
@@ -748,7 +751,7 @@ def extract_links(soup, base_url):
                 links.append(full_url)
                 seen_urls.add(normalized_url)
     except Exception as e:
-        print(f"Error extracting links: {e}")
+        logger.error(f"Error extracting links: {e}")
         
     return links
 
@@ -764,7 +767,7 @@ def is_same_domain(url1, url2):
         parsed_url2 = urlparse(url2)
         return parsed_url1.netloc == parsed_url2.netloc
     except Exception as e:
-        print(f"Error comparing domains: {e}")
+        logger.error(f"Error comparing domains: {e}")
         return False
 
 
@@ -1083,74 +1086,8 @@ def run_web_scraper(
         return None, None
 
 
-def extract_with_scrapegraph(url, api_key=None):
-    """
-    Extract product data using ScrapeGraphAI
-    
-    Args:
-        url (str): The URL to extract data from
-        api_key (str, optional): API key for ScrapeGraphAI. If None, uses the free tier.
-
-    Returns:
-        list: A list of dictionaries containing product information
-    """
-    if not SCRAPEGRAPH_AVAILABLE:
-        st.warning(
-            "ScrapeGraphAI is not available. Please install it with 'pip install scrapegraphai'")
-        logger.warning(
-            "ScrapeGraphAI not available, returning empty product list")
-        return []
-
-    try:
-        # Create ScrapeGraph client
-        client = scrapegraph.Client(api_key=api_key)
-
-        # Create a scraper with smart detection
-        scraper = client.create_scraper(
-            url=url,
-            extraction_type="e-commerce",
-            auto_pagination=True,
-            max_pages=5  # Limit to 5 pages for faster results
-        )
-
-        # Run the scraper
-        result = scraper.run()
-
-        # Process the results
-        products = []
-        for item in result.items:
-            product = {
-                "product_name": item.get("name", "Unknown"),
-                "price": item.get("price", "Price not found"),
-                "category": item.get("category", "Uncategorized"),
-                "description": item.get("description", "No description available"),
-                "source_url": url,
-                "original_category": item.get("category", "Uncategorized"),
-                "category_confidence": 0.8,  # ScrapeGraph has good accuracy
-                "is_valid_category": True,
-                "extracted_by": "ScrapeGraphAI"
-            }
-
-            # Add additional attributes if available
-            if "brand" in item:
-                product["brand"] = item["brand"]
-            if "availability" in item:
-                product["availability"] = item["availability"]
-            if "image_url" in item:
-                product["image_url"] = item["image_url"]
-            if "sku" in item:
-                product["sku"] = item["sku"]
-
-            products.append(product)
-
-        return products
-    except Exception as e:
-        st.error(f"Error extracting data with ScrapeGraphAI: {str(e)}")
-    return []
-
-
 def run_web_scraper(
-    start_url, 
+    start_url,
     max_pages, 
     verify_ssl, 
     same_domain_only=True, 
@@ -2180,7 +2117,7 @@ def deduplicate_products(extracted_data, similarity_threshold=0.8):
                     price_diff = abs(p1_val - p2_val)
                     max_price = max(p1_val, p2_val)
                     price_similarity = 1.0 - (price_diff / max_price) if max_price > 0 else 0.0
-            except:
+            except (ValueError, ZeroDivisionError):
                 price_similarity = rfuzz.ratio(price1, price2) / 100.0
         
         # Calculate final similarity score with adjusted weights
@@ -2942,72 +2879,6 @@ def extract_product_and_price(chunk, model_name):
                 return []
     
     # If all retries failed
-    return []
-
-
-def extract_with_scrapegraph(url, api_key=None):
-    """
-    Extract product data using ScrapeGraphAI
-
-    Args:
-        url (str): The URL to extract data from
-        api_key (str, optional): API key for ScrapeGraphAI. If None, uses the free tier.
-
-    Returns:
-        list: A list of dictionaries containing product information
-    """
-    if not SCRAPEGRAPH_AVAILABLE:
-        st.warning(
-            "ScrapeGraphAI is not available. Please install it with 'pip install scrapegraphai'")
-        logger.warning(
-            "ScrapeGraphAI not available, returning empty product list")
-        return []
-
-    try:
-        # Create ScrapeGraph client
-        client = scrapegraph.Client(api_key=api_key)
-
-        # Create a scraper with smart detection
-        scraper = client.create_scraper(
-            url=url,
-            extraction_type="e-commerce",
-            auto_pagination=True,
-            max_pages=5  # Limit to 5 pages for faster results
-        )
-
-        # Run the scraper
-        result = scraper.run()
-
-        # Process the results
-        products = []
-        for item in result.items:
-            product = {
-                "product_name": item.get("name", "Unknown"),
-                "price": item.get("price", "Price not found"),
-                "category": item.get("category", "Uncategorized"),
-                "description": item.get("description", "No description available"),
-                "source_url": url,
-                "original_category": item.get("category", "Uncategorized"),
-                "category_confidence": 0.8,  # ScrapeGraph has good accuracy
-                "is_valid_category": True,
-                "extracted_by": "ScrapeGraphAI"
-            }
-
-            # Add additional attributes if available
-            if "brand" in item:
-                product["brand"] = item["brand"]
-            if "availability" in item:
-                product["availability"] = item["availability"]
-            if "image_url" in item:
-                product["image_url"] = item["image_url"]
-            if "sku" in item:
-                product["sku"] = item["sku"]
-
-            products.append(product)
-
-        return products
-    except Exception as e:
-        st.error(f"Error extracting data with ScrapeGraphAI: {str(e)}")
     return []
 
 # Visualization functions
@@ -3776,10 +3647,10 @@ with tab1:
         st.success(
             "Undetectable Chrome enabled! This will help bypass advanced bot detection systems.")
     
-    # API endpoints and keys
-    OLLAMA_API_URL = "http://100.115.243.42:11434/api/generate"
-    OLLAMA_EMBEDDINGS_URL = "http://100.115.243.42:11434/api/embeddings"
-    OLLAMA_MODELS_URL = "http://100.115.243.42:11434/api/tags"
+    # API endpoints (using values configured at module level)
+    OLLAMA_API_URL = f"{_OLLAMA_HOST}/api/generate"
+    OLLAMA_EMBEDDINGS_URL = f"{_OLLAMA_HOST}/api/embeddings"
+    OLLAMA_MODELS_URL = f"{_OLLAMA_HOST}/api/tags"
 
     # Initialize API keys in session state if not present
     if "anthropic_api_key" not in st.session_state:
