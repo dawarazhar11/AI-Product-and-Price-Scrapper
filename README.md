@@ -5,24 +5,24 @@ An AI-powered web scraping and PDF processing toolkit built with Streamlit. Extr
 ## Features
 
 ### Web Scraper (`app.py`)
-- **Multi-engine browser automation** — Selenium, Playwright, and undetected Chrome for bypassing anti-bot protections (Cloudflare, etc.)
-- **LLM-powered extraction** — Uses Ollama models to intelligently extract product names, prices, descriptions, and categories from raw page content
-- **Vector similarity search** — ChromaDB-based embeddings for semantic chunk tagging and deduplication
-- **Fuzzy deduplication** — Combines RapidFuzz, FuzzyWuzzy, and textdistance for accurate duplicate detection
-- **Specialized extractors** — Purpose-built logic for fuel prices, automotive services, and professional services
-- **Multi-language support** — Automatic language detection and translation via `langdetect` and `deep-translator`
-- **Proxy support** — Free proxy rotation and custom proxy configuration
-- **Data persistence** — Save and reload scraped datasets locally
+- **Multi-engine browser automation** - Selenium, Playwright, and undetected Chrome for bypassing anti-bot protections (Cloudflare, etc.)
+- **LLM-powered extraction** - Uses Ollama models to intelligently extract product names, prices, descriptions, and categories from raw page content
+- **Vector similarity search** - ChromaDB-based embeddings for semantic chunk tagging and deduplication
+- **Fuzzy deduplication** - Combines RapidFuzz, FuzzyWuzzy, and textdistance for accurate duplicate detection
+- **Specialized extractors** - Purpose-built logic for fuel prices, automotive services, and professional services
+- **Multi-language support** - Automatic language detection and translation via `langdetect` and `deep-translator`
+- **Proxy support** - Free proxy rotation and custom proxy configuration
+- **Data persistence** - Save and reload scraped datasets locally
 
 ### PDF Processor (`pdf_app.py` / `pdf_handler.py`)
-- **Multi-library extraction** — PyMuPDF, pdfplumber, and PyPDF2 for text, tables, images, and metadata
-- **URL-based processing** — Fetch and process PDFs directly from URLs
-- **Auto-discovery** — Automatically find PDF links on web pages
-- **Menu extraction** — Specialized parsing for menu-style PDF documents
+- **Multi-library extraction** - PyMuPDF, pdfplumber, and PyPDF2 for text, tables, images, and metadata
+- **URL-based processing** - Fetch and process PDFs directly from URLs
+- **Auto-discovery** - Automatically find PDF links on web pages
+- **Menu extraction** - Specialized parsing for menu-style PDF documents
 
 ### Launcher Tools
-- `simple_launcher.py` — Streamlit-based GUI to launch either tool
-- `app_launcher.py` — Standalone launcher with automatic dependency checking
+- `simple_launcher.py` - Streamlit-based GUI to launch either tool
+- `app_launcher.py` - Standalone launcher with automatic dependency checking
 
 ## Requirements
 
@@ -99,14 +99,14 @@ streamlit run simple_launcher.py
 ## Project Structure
 
 ```
-├── app.py               # Main web scraper application
-├── pdf_app.py           # PDF processor Streamlit UI
-├── pdf_handler.py       # PDF extraction utilities
-├── app_launcher.py      # Standalone launcher with dependency checks
-├── simple_launcher.py   # Streamlit-based launcher
-├── requirements.txt     # Python dependencies
-├── .env.example         # Environment variable template
-└── pyproject.toml       # Project metadata
+app.py               # Main web scraper application
+pdf_app.py           # PDF processor Streamlit UI
+pdf_handler.py       # PDF extraction utilities
+app_launcher.py      # Standalone launcher with dependency checks
+simple_launcher.py   # Streamlit-based launcher
+requirements.txt     # Python dependencies
+.env.example         # Environment variable template
+pyproject.toml       # Project metadata
 ```
 
 ## License
