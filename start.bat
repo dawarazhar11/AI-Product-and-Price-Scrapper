@@ -1,5 +1,5 @@
 @echo off
-echo Starting TonyScrapper Tools...
+echo Starting AI Product and Price Scrapper Tools...
 echo.
 
 :: Check if Python is available in the path
@@ -26,7 +26,7 @@ if exist venv\Scripts\activate.bat (
 )
 
 :: Run the simple launcher
-echo Launching TonyScrapper Tools...
+echo Launching AI Product and Price Scrapper Tools...
 streamlit run simple_launcher.py --server.port=8600
 
 :: Keep the window open if there's an error

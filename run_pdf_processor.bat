@@ -1,5 +1,5 @@
 @echo off
-echo Starting TonyScrapper PDF Processor...
+echo Starting AI Product and Price Scrapper PDF Processor...
 echo.
 
 :: Check if Python is available in the path

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TonyScrapper - Standalone Launcher
+AI Product and Price Scrapper - Standalone Launcher
 This script serves as the entry point for the standalone executable.
 """
 
@@ -129,7 +129,7 @@ def main():
     """Main entry point"""
     # Show welcome message
     print("="*50)
-    print("    TonyScrapper PDF Processor Launcher")
+    print("    AI Product and Price Scrapper - Launcher")
     print("="*50)
     print("\nPreparing to launch...\n")
     

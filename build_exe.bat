@@ -1,5 +1,5 @@
 @echo off
-echo Building TonyScrapper PDF Processor Executable...
+echo Building AI_Product_Price_Scrapper PDF Processor Executable...
 echo.
 
 :: Check if Python is available in the path
@@ -39,7 +39,7 @@ if not exist builds (
 
 :: Build the executable
 echo Building executable...
-pyinstaller --onefile --name "TonyScrapper_PDF_Processor" ^
+pyinstaller --onefile --name "AI_Product_Price_Scrapper_PDF_Processor" ^
     --add-data "pdf_app.py;." ^
     --add-data "pdf_handler.py;." ^
     --add-data "requirements.txt;." ^
@@ -57,13 +57,13 @@ if exist requirements.txt copy requirements.txt dist\ >nul
 if exist README.md copy README.md dist\ >nul
 
 :: Create a simple launcher batch file in the dist folder
-echo @echo off > dist\TonyScrapper_PDF_Processor.bat
-echo cd /d "%%~dp0" >> dist\TonyScrapper_PDF_Processor.bat
-echo start "" "TonyScrapper_PDF_Processor.exe" >> dist\TonyScrapper_PDF_Processor.bat
+echo @echo off > dist\AI_Product_Price_Scrapper_PDF_Processor.bat
+echo cd /d "%%~dp0" >> dist\AI_Product_Price_Scrapper_PDF_Processor.bat
+echo start "" "AI_Product_Price_Scrapper_PDF_Processor.exe" >> dist\AI_Product_Price_Scrapper_PDF_Processor.bat
 
 echo.
 echo Build complete! The executable is located in the dist folder.
-echo You can run the application by double-clicking TonyScrapper_PDF_Processor.exe
+echo You can run the application by double-clicking AI_Product_Price_Scrapper_PDF_Processor.exe
 echo.
 echo Press any key to exit...
 pause >nul 

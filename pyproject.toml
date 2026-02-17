@@ -1,5 +1,5 @@
 [project]
-name = "tonyscrapper"
+name = "ai-product-and-price-scrapper"
 version = "1.0.0"
 description = "AI-powered web scraping and PDF processing toolkit"
 readme = "README.md"
@@ -7,4 +7,4 @@ requires-python = ">=3.9"
 license = {text = "MIT"}
 
 [project.scripts]
-tonyscrapper = "app_launcher:main"
+ai-scrapper = "app_launcher:main"

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-TonyScrapper - Simple Minimalist Launcher
+AI Product and Price Scrapper - Simple Minimalist Launcher
 """
 
 import os
@@ -12,7 +12,7 @@ import streamlit as st
 
 # Set page configuration
 st.set_page_config(
-    page_title="TonyScrapper Tools",
+    page_title="AI Product and Price Scrapper",
     page_icon="🛠️",
     layout="centered",
     initial_sidebar_state="collapsed"
@@ -111,7 +111,7 @@ def launch_app(app_file, port):
         return False
 
 # Header
-st.markdown("<h1 class='header'>TonyScrapper Tools</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='header'>AI Product and Price Scrapper</h1>", unsafe_allow_html=True)
 st.markdown("<p class='description'>Select a tool to launch:</p>", unsafe_allow_html=True)
 
 # Web Scraper Section
@@ -158,4 +158,4 @@ if st.button("Stop All Running Applications", key="stop_all"):
             st.info("No running applications found")
 
 # Footer
-st.markdown("<div class='footer'>© 2025 TonyScrapper Tools</div>", unsafe_allow_html=True) 
+st.markdown("<div class='footer'>AI Product and Price Scrapper</div>", unsafe_allow_html=True) 
